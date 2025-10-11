@@ -50,11 +50,11 @@ const renderBooks = (books) => {
     // e.g. 25 from https://pokeapi.co/api/v2/pokemon/25/
           const id = book.id
  // assign a unique ID to the popover accounting for pokemon having multiple types
-          const popoverId = `${book.Title}-${id}`
+          const popoverId =  `book-${book.handle}-${id}`
 
     // the template includes a button to open the popover
     // as well as a placeholder for the popover itself.
-    const iconURL = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`
+    const iconURL = `https://cdn.vectorstock.com/i/500p/11/48/cartoon-stack-of-books-icon-vector-51211148.jpg`
     let template =
       `<button class="open" popoverTarget="${popoverId}" >
               <img src="${iconURL}" onError="this.src='pokeball.svg'"/>
@@ -68,19 +68,51 @@ const renderBooks = (books) => {
               </div>
             </div>`
     div.innerHTML = DOMPurify.sanitize(template)
+    const bookurl = `https://stephen-king-api.onrender.com/api/book/${book.id}`
     // when the popover is opened, fetch details and build a profile
     // we only do this when opened to avoid excessive API calls 
     div.querySelector(`#${popoverId}`)
       .addEventListener('toggle', async (event) => {
         if (event.newState == 'open') {
-          //event.target.innerHTML = await createProfile(popoverId, item.pokemon.url)
+          event.target.innerHTML = await createBookProfile(popoverId, bookurl)
           console.log('book clicked');
         }
       })
 
 
             
-  bookList.appendChild(bookItem);
+  bookList.appendChild(div);
   });
 }
+
+
+// Given the URL for a single pokemon, fetch details from the API
+// and build a profile for the pokemon. 
+// this includes a template populated with details 
+// it also includes a close button.
+const createBookProfile = async (popoverId, url) => {
+  const data = await fetch(url)
+  const json = await data.json()
+  const book = json.data
+  //const imageURL = getProfileImageURL(book)
+  // build a template to hold details for this pokemon 
+  const template = ` 
+  <div class="profile">
+    <button class="close" popovertarget="${popoverId}"  >Close</button>
+    <div class="details"> 
+    
+      <div class="characteristics"> 
+        <h2>${book.Title}</h2>
+        <h3>
+          ${ book.Year}
+        </h3>
+
+      </div>
+      <div>${book.villains.map(v => `<span class="villain">${v.name}</span>`).join(', ')}</div>
+
+    </div> 
+  </div>`
+  return DOMPurify.sanitize(template)
+}
+
 
