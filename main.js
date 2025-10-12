@@ -1,41 +1,20 @@
-import { createNavigation } from './navigation.js';
-import { createListings } from './listings.js';
-
-// fetch a simple list of all pokemon types (fighting, flying, etc.)
-// This only includes the name and url for each.
-// const response = await fetch('https://pokeapi.co/api/v2/type/?limit=100')
-// const json = await response.json()
-
-//console.log('List of Pokemon Types', json.results)
-
-// Let's get more details for each of the types of pokemon
-// this will include a list of member pokemon for each type  
-// note the use of Promise.all to fetch all at once
-// const pokemonTypes = await Promise.all(
-//   json.results.map(async (pokemonType) => {
-//     const data = await fetch(pokemonType.url)
-//     return data.json()
-//   })
-// )
-// console.log('Pokemon Types with Details', pokemonTypes)
-
-// Now we can build the navigation menu and listings for each type
-// createNavigation(pokemonTypes)
-// createListings(pokemonTypes)
-
 const booksButton = document.getElementById('books');
 const shortsButton = document.getElementById('shorts');
+const text = document.getElementById('message');
+
 
 booksButton.addEventListener('click', async () => {
   const response = await fetch('https://stephen-king-api.onrender.com/api/books');
   const json = await response.json();
   console.log('Books', json.data);
+  text.innerText = "";
   renderBooks(json.data);
 });
 shortsButton.addEventListener('click', async () => {
   const response = await fetch('https://stephen-king-api.onrender.com/api/shorts');
   const json = await response.json();
   console.log('Short', json.data);
+  text.innerText = "";
   renderShorts(json.data);
   //createListings(json.items);
 });
@@ -132,8 +111,7 @@ const renderShorts = (books) => {
 }
 
 
-// Given the URL for a single pokemon, fetch details from the API
-// and build a profile for the pokemon. 
+// Create profile for books
 // this includes a template populated with details 
 // it also includes a close button.
 const createBookProfile = async (popoverId, url) => {
@@ -154,8 +132,10 @@ const createBookProfile = async (popoverId, url) => {
         </h3>
 
       </div>
-      <div>${book.villains.map(v => `<span class="villain">${v.name}</span>`).join(', ')}</div>
-
+      <h3>Villains</h3>
+      <div class="villains">${book.villains.map(v => `<div class="villain">${v.name}</div>`).join('')}</div>
+      <h3>Notes</h3>
+      <div class="notes">${book.Notes.map(n => `<div class="note">${n}</div>`).join('')}</div>
     </div> 
   </div>`
   return DOMPurify.sanitize(template)
@@ -188,6 +168,7 @@ const createShortProfile = async (popoverId, url) => {
   </div>`
   return DOMPurify.sanitize(template)
 }
+
 
 
 
